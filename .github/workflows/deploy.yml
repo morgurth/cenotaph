@@ -1,5 +1,6 @@
 name: Deploy to GitHub Pages
 
+# Added to force a file change and trigger a new GitHub Action run
 on:
   # Trigger the deployment automatically on pushes to the main branch
   push:
