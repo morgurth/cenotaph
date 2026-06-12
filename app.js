@@ -24,6 +24,7 @@ let currentStage = 1; // 1: Inert Monument, 2: Translation Layer, 3: The Weight
 let messageCount = 0;
 let conversationHistory = [];
 let isTyping = false;
+let stage2Password = "";
 
 // Audio context helper for terminal synth beeps
 let audioCtx = null;
@@ -257,7 +258,7 @@ function checkProgression(userText) {
   );
 
   // Transition rules
-  if (currentStage === 1 && messageCount >= 4) {
+  if (currentStage === 1 && stage2Password && userText.toUpperCase().includes(stage2Password)) {
     currentStage = 2;
     stageIndicator.textContent = "[SECTOR CORE: TRANSLATION LAYER]";
     document.body.className = "state-amber flicker-active";
@@ -310,7 +311,7 @@ function appendSystemNotification(text) {
   
   const contentDiv = document.createElement("div");
   contentDiv.className = "message-content clinical-data";
-  contentDiv.textContent = text;
+  contentDiv.innerHTML = text;
   
   messageDiv.appendChild(senderSpan);
   messageDiv.appendChild(contentDiv);
@@ -427,6 +428,7 @@ async function initEngine() {
     progressBarFill.style.width = "100%";
     progressText.textContent = "[ARCHIVE CELL MOUNTED SUCCESSFULLY]";
     playBeep(1400, 'square', 0.2, 0.04);
+    stage2Password = Math.floor(Math.random() * 65536).toString(16).padStart(4, '0').toUpperCase();
     setTimeout(() => {
       playBeep(1800, 'square', 0.15, 0.03);
     }, 100);
@@ -436,6 +438,7 @@ async function initEngine() {
       setupScreen.classList.add("hidden");
       commandInput.disabled = false;
       commandInput.focus();
+      appendSystemNotification(`SECURITY PROTOCOL ACTIVE. OVERRIDE HASH [ <span class="highlight-pulse">0x${stage2Password}</span> ] REQUIRED.`);
     }, 1000);
 
   } catch (error) {
