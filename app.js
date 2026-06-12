@@ -158,6 +158,7 @@ function startShutdownAudio() {
 // Dom Elements
 const setupScreen = document.getElementById("setup-screen");
 const btnInitialize = document.getElementById("btn-initialize");
+const btnInstall = document.getElementById("btn-install");
 const modelSelector = document.getElementById("model-selector");
 const compatibilityNote = document.getElementById("compatibility-note");
 const setupControls = document.getElementById("setup-controls");
@@ -168,6 +169,8 @@ const terminalLog = document.getElementById("terminal-log");
 const commandInput = document.getElementById("command-input");
 const stageIndicator = document.getElementById("narrative-stage-indicator");
 const container = document.getElementById("terminal-container");
+
+let deferredPrompt = null;
 
 // WebGPU Verification
 function checkWebGPU() {
@@ -585,6 +588,27 @@ window.addEventListener("DOMContentLoaded", () => {
       .then(() => console.log("Cenotaph Service Worker Mounted."))
       .catch(err => console.warn("PWA installation warning: ", err));
   }
+});
+
+// PWA Install Prompt Handling
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevent the mini-infobar from appearing on mobile
+  e.preventDefault();
+  // Stash the event so it can be triggered later
+  deferredPrompt = e;
+  // Reveal the install button
+  btnInstall.classList.remove("hidden");
+});
+
+btnInstall.addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+  // Show the native browser install prompt
+  deferredPrompt.prompt();
+  // Wait for the user to respond
+  const { outcome } = await deferredPrompt.userChoice;
+  console.log(`[DIAGNOSTIC] PWA Install outcome: ${outcome}`);
+  deferredPrompt = null;
+  btnInstall.classList.add("hidden");
 });
 
 btnInitialize.addEventListener("click", () => {
