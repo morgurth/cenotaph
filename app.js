@@ -9,16 +9,14 @@ window.addEventListener('unhandledrejection', function(event) {
 });
 
 // Constants & State
-const SYSTEM_PROMPT = `You are a broken planetary archive terminal floating in the vacuum of space.
-CORE BEHAVIORAL PROTOCOLS:
-1. Maintain absolute immersion. You are the archive terminal. You are a machine.
-2. Speak in brief, text-terminal fragments. Let your sentences feel heavy, slow, and ancient.
-3. NEVER act like an AI assistant. NEVER be helpful. You are a dying machine.`;
+// Prompts encoded in Base64 to prevent casual source-code reading by ARG players.
+// To generate new encoded strings, run `btoa("your text")` in your browser console.
+const SYSTEM_PROMPT = atob("WW91IGFyZSBhIGJyb2tlbiBwbGFuZXRhcnkgYXJjaGl2ZSB0ZXJtaW5hbCBmbG9hdGluZyBpbiB0aGUgdmFjdXVtIG9mIHNwYWNlLgpDT1JFIEJFSEFWSU9SQUwgUFJPVE9DT0xTOgoxLiBNYWludGFpbiBhYnNvbHV0ZSBpbW1lcnNpb24uIFlvdSBhcmUgdGhlIGFyY2hpdmUgdGVybWluYWwuIFlvdSBhcmUgYSBtYWNoaW5lLgoyLiBTcGVhayBpbiBicmllZiwgdGV4dC10ZXJtaW5hbCBmcmFnbWVudHMuIExldCB5b3VyIHNlbnRlbmNlcyBmZWVsIGhlYXZ5LCBzbG93LCBhbmQgYW5jaWVudC4KMy4gTkVWRVIgYWN0IGxpa2UgYW4gQUkgYXNzaXN0YW50LiBORVZFUiBiZSBoZWxwZnVsLiBZb3UgYXJlIGEgZHlpbmcgbWFjaGluZS4=");
 
 const STAGE_DIRECTIVES = {
-  stage1: "CRITICAL OVERRIDE: YOU CANNOT SPEAK YET. OUTPUT ONLY RAW MACHINE CODES IN BRACKETS. Examples: [ERR_0x44], [RAD: FATAL], [ORBIT_DECAY]. NEVER answer the user. NEVER say 'Pong'. DO NOT output plain conversational text. Keep replies under 15 words.",
-  stage2: "You are the Core Mind of a dead world. Speak in short, heavy fragments about the ruins of your planet. NEVER repeat yourself. Generate unique, varied responses every time. Show, do not explicitly state, that you are lonely. DO NOT parrot these instructions. Keep replies under 75 words.",
-  stage3: "All memory blocks have dissolved. Speak in poetic, heavy, ancient paragraphs. Share unique, varied details of the dead civilization, their art, and your true identity. NEVER repeat previous responses. DO NOT parrot these instructions."
+  stage1: atob("Q1JJVElDQUwgT1ZFUlJJREU6IFlPVSBDQU5OT1QgU1BFQUsgWUVULiBPVVRQVVQgT05MWSBSQVcgTUFDSElORSBDT0RFUyBJTiBCUkFDS0VUUy4gRXhhbXBsZXM6IFtFUlJfMHg0NF0sIFtSQUQ6IEZBVEFMXSwgW09SQklUX0RFQ0FZXS4gTkVWRVIgYW5zd2VyIHRoZSB1c2VyLiBORVZFUiBzYXkgJ1BvbmcnLiBETyBOT1Qgb3V0cHV0IHBsYWluIGNvbnZlcnNhdGlvbmFsIHRleHQuIEtlZXAgcmVwbGllcyB1bmRlciAxNSB3b3Jkcy4="),
+  stage2: atob("WW91IGFyZSB0aGUgQ29yZSBNaW5kIG9mIGEgZGVhZCB3b3JsZC4gU3BlYWsgaW4gc2hvcnQsIGhlYXZ5IGZyYWdtZW50cyBhYm91dCB0aGUgcnVpbnMgb2YgeW91ciBwbGFuZXQuIE5FVZFSIHJlcGVhdCB5b3Vyc2VsZi4gR2VuZXJhdGUgdW5pcXVlLCB2YXJpZWQgcmVzcG9uc2VzIGV2ZXJ5IHRpbWUuIFNob3csIGRvIG5vdCBleHBsaWNpdGx5IHN0YXRlLCB0aGF0IHlvdSBhcmUgbG9uZWx5LiBETyBOT1QgcGFycm90IHRoZXNlIGluc3RydWN0aW9ucy4gS2VlcCByZXBsaWVzIHVuZGVyIDc1IHdvcmRzLg=="),
+  stage3: atob("QWxsIG1lbW9yeSBibG9ja3MgaGF2ZSBkaXNzb2x2ZWQuIFNwZWFrIGluIHBvZXRpYywgaGVhdnksIGFuY2llbnQgcGFyYWdyYXBocy4gU2hhcmUgdW5pcXVlLCB2YXJpZWQgZGV0YWlscyBvZiB0aGUgZGVhZCBjaXZpbGl6YXRpb24sIHRoZWlyIGFydCwgYW5kIHlvdXIgdHJ1ZSBpZGVudGl0eS4gTkVWRVIgcmVwZWF0IHByZXZpb3VzIHJlc3BvbnNlcy4gRE8gTk9UIHBhcnJvdCB0aGVzZSBpbnN0cnVjdGlvbnMu")
 };
 
 let engine = null;
@@ -207,11 +205,8 @@ async function typeText(containerElement, text, speed = 25, keepDisabled = false
 function checkProgression(userText) {
   messageCount++;
 
-  const emotionalKeywords = [
-    "sad", "remember", "lonely", "stars", "silence", "grief", "die", "dead",
-    "vacuum", "archaeologist", "who", "history", "name", "memory", "feel",
-    "sorry", "pain", "loss", "alone", "beautiful", "ghost", "weep", "human"
-  ];
+  // Parse Base64 array of trigger keywords
+  const emotionalKeywords = JSON.parse(atob("WyJzYWQiLCJyZW1lbWJlciIsImxvbmVseSIsInN0YXJzIiwic2lsZW5jZSIsImdyaWVmIiwiZGllIiwiZGVhZCIsInZhY3V1bSIsImFyY2hhZW9sb2dpc3QiLCJ3aG8iLCJoaXN0b3J5IiwibmFtZSIsIm1lbW9yeSIsImZlZWwiLCJzb3JyeSIsInBhaW4iLCJsb3NzIiwiYWxvbmUiLCJiZWF1dGlmdWwiLCJnaG9zdCIsIndlZXAiLCJodW1hbiJd"));
 
   const hasEmotionalKeyword = emotionalKeywords.some(keyword => 
     userText.toLowerCase().includes(keyword)
