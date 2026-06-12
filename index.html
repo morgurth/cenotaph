@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Cenotaph // Local Interactive Fiction</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <!-- PWA iOS support -->
+  <!-- Updated to modern standard to clear console warnings -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body class="flicker-active">
+  <!-- CRT Screen Layers -->
+  <div class="crt-overlay"></div>
+  <div class="crt-vignette"></div>
+
+  <!-- Setup & Loading Screen Overlay -->
+  <div id="setup-screen" class="overlay-screen">
+    <div class="screen-card">
+      <h1>THE CENOTAPH</h1>
+      <p id="compatibility-note">
+        PLANETARY ARCHIVE HARDWARE INITIALIZATION STATE: PENDING.<br>
+        WebGPU is required for local browser model compilation and execution.
+      </p>
+      
+      <div id="setup-controls" class="setup-form">
+        <div class="form-group">
+          <label for="model-selector">SELECT CORE MIND SECTOR (LLM SELECTION):</label>
+          <select id="model-selector" class="retro-select">
+            <option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen-2.5-0.5B-Instruct (~380MB - Ultra Low Compute / Fast)</option>
+            <option value="Llama-3.2-1B-Instruct-q4f16_1-MLC">Llama-3.2-1B-Instruct (~1.1GB - Recommended / Fast)</option>
+            <option value="gemma-2b-it-q4f16_1-MLC">Gemma-2B-Instruct (~1.6GB - Medium / Highly Creative)</option>
+            <option value="Llama-3-8B-Instruct-q4f16_1-MLC" selected>Llama-3-8B-Instruct (~4.5GB - High Compute / High Quality)</option>
+          </select>
+        </div>
+        <button id="btn-initialize" class="retro-btn">BOOT ARCHIVE MEMORY CORE</button>
+      </div>
+
+      <!-- Loading progress display -->
+      <div id="loading-container" class="hidden">
+        <p id="loading-status-title">[INITIALIZING TELEMETRY STREAM...]</p>
+        <div class="progress-bar-container">
+          <div id="progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+        <p id="progress-text" class="progress-telemetry-text">[CONNECTING SECTOR MEMORY...]</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Terminal UI -->
+  <div id="terminal-container">
+    <header>
+      <span class="header-status">[SIGNAL STRENGTH: WEAK]</span>
+      <span id="narrative-stage-indicator" class="header-status">[SECTOR CORE: INERT MONUMENT]</span>
+      <span class="header-status">[RUNTIME: ACTIVE]</span>
+    </header>
+
+    <main id="terminal-log">
+      <!-- Conversation history will append here -->
+      <div class="message-entry">
+        <span class="sender-tag">[SYSTEM]</span>
+        <div class="message-content">CORE MIND ONLINE. PLANETARY ARCHIVE ESTABLISHED. MEMORY SECTORS DRIFTING IN VACUUM. SEND TELEMETRY INQUIRY TO AWAKEN MEMORY CELL.</div>
+      </div>
+    </main>
+
+    <footer>
+      <span class="prompt-symbol">&gt;</span>
+      <input type="text" id="command-input" placeholder="Type command or query..." autocomplete="off" autofocus disabled />
+    </footer>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

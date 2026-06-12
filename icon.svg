@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <rect width="512" height="512" fill="#000000" rx="64"/>
+  <!-- Glowing green terminal frame -->
+  <rect x="48" y="48" width="416" height="416" fill="none" stroke="#33ff33" stroke-width="20" rx="32" filter="drop-shadow(0 0 10px rgba(51,255,51,0.5))"/>
+  <!-- Stylized Monolith / Cenotaph shape -->
+  <polygon points="206,120 306,120 336,360 176,360" fill="#111111" stroke="#33ff33" stroke-width="12" filter="drop-shadow(0 0 15px rgba(51,255,51,0.7))"/>
+  <!-- Console prompt symbol inside the monolith -->
+  <path d="M 230,240 L 250,250 L 230,260" fill="none" stroke="#33ff33" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="258" y1="260" x2="278" y2="260" stroke="#33ff33" stroke-width="10" stroke-linecap="round"/>
+</svg>
