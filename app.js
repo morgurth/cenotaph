@@ -59,6 +59,12 @@ let ambientOsc2 = null;
 let ambientFilter = null;
 let ambientGain = null;
 
+// Shutdown Audio
+let shutdownWhine = null;
+let shutdownStatic = null;
+let whineGain = null;
+let staticGain = null;
+
 function startAmbientDrone() {
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -111,6 +117,41 @@ function updateAmbientDrone(stage) {
       ambientFilter.frequency.exponentialRampToValueAtTime(150, now + 5);
       ambientGain.gain.exponentialRampToValueAtTime(0.12, now + 5);
     }
+  } catch (e) {}
+}
+
+function startShutdownAudio() {
+  if (!audioCtx) return;
+  try {
+    // High-pitched whine
+    shutdownWhine = audioCtx.createOscillator();
+    whineGain = audioCtx.createGain();
+    shutdownWhine.type = 'sine';
+    shutdownWhine.frequency.setValueAtTime(7500, audioCtx.currentTime);
+    whineGain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    whineGain.gain.exponentialRampToValueAtTime(0.02, audioCtx.currentTime + 1);
+    shutdownWhine.connect(whineGain);
+    whineGain.connect(audioCtx.destination);
+    shutdownWhine.start();
+
+    // White noise static
+    const bufferSize = audioCtx.sampleRate * 2; // 2 seconds of noise
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+    shutdownStatic = audioCtx.createBufferSource();
+    shutdownStatic.buffer = noiseBuffer;
+    shutdownStatic.loop = true;
+    
+    staticGain = audioCtx.createGain();
+    staticGain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    staticGain.gain.exponentialRampToValueAtTime(0.04, audioCtx.currentTime + 1);
+    
+    shutdownStatic.connect(staticGain);
+    staticGain.connect(audioCtx.destination);
+    shutdownStatic.start();
   } catch (e) {}
 }
 
@@ -238,6 +279,7 @@ function checkProgression(userText) {
   } else if (currentStage === 3 && messageCount >= 18) {
     currentStage = 4;
     stageIndicator.textContent = "[SECTOR CORE: TERMINAL FAILURE]";
+    document.body.className = "state-terminal flicker-active";
     triggerGlitch();
   }
 }
@@ -277,6 +319,7 @@ function appendSystemNotification(text) {
 
 // Scripted Ending Sequence
 async function triggerShutdownSequence() {
+  startShutdownAudio();
   const mainEl = document.getElementById("terminal-log");
 
   const sysEntry = document.createElement("div");
@@ -322,7 +365,13 @@ async function triggerShutdownSequence() {
     // 2. Trigger the final cinematic fade to black
     downloadBtn.textContent = "[SYSTEM DEACTIVATING...]";
     downloadBtn.disabled = true;
+    // Fade out all audio
     if (ambientGain && audioCtx) ambientGain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 5);
+    if (whineGain && audioCtx) whineGain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 5);
+    if (staticGain && audioCtx) staticGain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 5);
+    // Stop the sources after fade out
+    if (shutdownWhine) shutdownWhine.stop(audioCtx.currentTime + 5.1);
+    if (shutdownStatic) shutdownStatic.stop(audioCtx.currentTime + 5.1);
     document.body.style.transition = "opacity 6s ease-out";
     document.body.style.opacity = "0";
     commandInput.placeholder = "[CONNECTION LOST]";
