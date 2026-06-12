@@ -1,4 +1,4 @@
-const CACHE_NAME = "cenotaph-v20";
+const CACHE_NAME = "cenotaph-v21";
 const ASSETS = [
   "./",
   "./index.html",
